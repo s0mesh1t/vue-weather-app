@@ -3,7 +3,7 @@ Simple but beautify weather app
 
 ## Screenshot
 
-![screenshot](screenshot.png "Screenshot")
+![screenshot](screenshot.jpg "Screenshot")
 
 ## Project setup
 ```
