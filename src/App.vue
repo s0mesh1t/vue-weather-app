@@ -1,73 +1,94 @@
 <template>
-	<div class="container">
+	<div class="container" v-if="typeof weather.main != 'undefined'">
 		<div class="weather-side">
 			<div class="weather-gradient"></div>
 			<div class="date-container">
 				<h2 class="date-dayname">{{ getDate.weekday }}</h2>
-				<span class="date-day">{{ getDate.date }}</span
-				><i class="location-icon fas fa-map-marker-alt"></i>
-				<span class="location">Paris, FR</span>
+				<span class="date-day">{{ getDate.date }}</span>
+				<span class="location">
+					<span class="bookmark-add" @click="addToBookmarks()" title="add to bookmark"><i class="fas fa-bookmark" /></span>
+					{{ weather.name }}, {{ weather.sys.country }}
+				</span>
 			</div>
 
 			<div class="weather-container">
-				<i class="weather-icon far fa-sun"></i>
-				<h1 class="weather-temp">29°C</h1>
-				<h3 class="weather-desc">Sunny</h3>
+				<i class="weather-icon far fa-sun" />
+				<h1 class="weather-temp">{{ Math.round(weather.main.temp) }}°C</h1>
+				<h3 class="weather-desc">{{ weather.weather[0].main }}</h3>
 			</div>
 		</div>
 
 		<div class="info-side">
 			<div class="today-info-container">
+				<img class="info-logo" src="@/assets/logo.png" alt="VueLogo" />
 				<div class="today-info">
-					<div class="precipitation">
-						<span class="title">PRECIPITATION</span><span class="value">0 %</span>
-						<div class="clear"></div>
-					</div>
 					<div class="humidity">
-						<span class="title">HUMIDITY</span><span class="value">34 %</span>
+						<span class="title">HUMIDITY</span><span class="value">{{ weather.main.humidity }} %</span>
 						<div class="clear"></div>
 					</div>
 					<div class="wind">
-						<span class="title">WIND</span><span class="value">0 km/h</span>
+						<span class="title">WIND</span><span class="value">{{ weather.wind.speed }} km/h</span>
 						<div class="clear"></div>
 					</div>
 				</div>
 			</div>
 
-			<div class="week-container">
-				<ul class="week-list">
-					<li class="active">
-						<i class="day-icon far fa-sun"></i>
-						<span class="day-name">Tue</span><span class="day-temp">29°C</span>
-					</li>
-					<li>
-						<i class="day-icon fas fa-cloud"></i>
-						<span class="day-name">Wed</span><span class="day-temp">21°C</span>
-					</li>
-					<li>
-						<i class="day-icon fas fa-cloud-meatball"></i><span class="day-name">Thu</span><span class="day-temp">08°C</span>
-					</li>
-					<li>
-						<i class="day-icon fas fa-cloud-showers-heavy"></i><span class="day-name">Fry</span
-						><span class="day-temp">19°C</span>
-					</li>
-					<div class="clear"></div>
-				</ul>
-			</div>
-
 			<div class="location-container">
-				<button class="location-button"><i data-feather="map-pin"></i><span>Change location</span></button>
+				<form @submit.prevent="fetchWeather()" accept-charset="utf-8">
+					<input class="location-input" type="text" v-model="query" placholder="Enter your location" />
+					<button type="submit" class="location-button">
+						<i class="location-icon fas fa-map-marker-alt"></i> <span>Change location</span>
+					</button>
+				</form>
 			</div>
+		</div>
+
+		<div v-if="bookmarks.length" class="bookmarks">
+			<div class="bookmarks-button"><span /></div>
+			<h3>Bookmarks:</h3>
+			<ul class="bookmarks-list">
+				<li
+					@click="
+						query = bookmark;
+						fetchWeather;
+					"
+					v-for="(bookmark, index) in bookmarks"
+					:key="index"
+				>
+					{{ bookmark }}
+				</li>
+			</ul>
 		</div>
 	</div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
 	name: "App",
 	data: () => ({
-		API_URL: "pro.openweathermap.org/data/2.5/forecast/hourly",
+		api_url: "https://api.openweathermap.org/data/2.5/",
+		api_key: "814ca0274a5978ef78c6b9b44ff87547",
+		query: "Moscow",
+		weather: {},
+		bookmarks: [],
 	}),
+	methods: {
+		fetchWeather() {
+			axios
+				.get(`${this.api_url}weather?q=${this.query}&units=metric&appid=${this.api_key}`)
+				.then((response) => (this.weather = response.data))
+				.catch((error) => console.log(error));
+		},
+		addToBookmarks() {
+			console.log(this.bookmarks.indexOf(this.query));
+			if (this.bookmarks.indexOf(this.query) !== -1) {
+				return;
+			}
+			this.bookmarks.push(this.query);
+		},
+	},
 	computed: {
 		getDate: function () {
 			const d = new Date();
@@ -88,9 +109,11 @@ export default {
 			const month = d.getMonth() + 1;
 			const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getDay()];
 			const date = `${d.getDate()}, ${monthNames[month]} ${d.getFullYear()}`;
-
 			return { date, weekday };
 		},
+	},
+	mounted() {
+		this.fetchWeather();
 	},
 };
 </script>
@@ -188,9 +211,8 @@ body {
 
 .location-icon {
 	display: inline-block;
-	font-size: 0.8em;
+	font-size: 1em;
 	margin-right: 7px;
-	margin-bottom: 2px;
 }
 
 .weather-container {
@@ -218,6 +240,14 @@ body {
 	float: left;
 	height: 100%;
 	padding-top: 25px;
+	min-width: 330px;
+}
+
+.info-logo {
+	display: block;
+	margin: 0 auto;
+	margin-top: -140px;
+	padding-bottom: 20px;
 }
 
 .today-info {
@@ -308,6 +338,26 @@ body {
 	transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 
+.location-input {
+	outline: none;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	border: none;
+	border-radius: 25px;
+	padding: 10px 20px;
+	font-family: "Montserrat", sans-serif;
+	color: #ffffff;
+	background: none;
+	font-weight: 700;
+	border: 2px solid rgba(#72edf2, 0.5);
+	margin-bottom: 15px;
+}
+
+.location-input:focus {
+	border-color: rgba(#72edf2, 0.8);
+}
+
 .location-button:hover {
 	-webkit-transform: scale(0.95);
 	-ms-transform: scale(0.95);
@@ -318,5 +368,31 @@ body {
 	height: 1em;
 	width: auto;
 	margin-right: 5px;
+}
+
+.bookmarks {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 300px;
+	background: #222831;
+	text-align: center;
+}
+.bookmarks-list {
+	list-style: none;
+	padding: 0;
+	li {
+		margin-bottom: 7px;
+		cursor: pointer;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+.bookmark-add {
+	cursor: pointer;
+	&:hover {
+		color: #323232;
+	}
 }
 </style>
