@@ -1,4 +1,9 @@
-# vue-weather-app
+# vue-weather-app - [Demo](https://nulloneguy.github.io/vue-weather-app/)
+Simple but beautify weather app
+
+## Screenshot
+
+![screenshot](screenshot.png "Screenshot")
 
 ## Project setup
 ```
