@@ -360,7 +360,7 @@ body {
   box-sizing: border-box;
   border: none;
   border-radius: 15px;
-  padding: 10px;
+  padding: 15px;
   font-family: "Montserrat", sans-serif;
   background-image: var(--gradient);
   color: #ffffff;
