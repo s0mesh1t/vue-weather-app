@@ -133,7 +133,7 @@ export default {
       <div v-if="showBookmarks">
         <ul class="bookmarks-list">
           <li
-              @click="
+            @click="
               query = bookmark;
               fetchWeather();
             "
