@@ -205,8 +205,8 @@ body {
   -webkit-box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.2);
   box-shadow: 0 0 20px -10px rgba(0, 0, 0, 0.2);
   float: left;
-  -webkit-transform: scale(1.1) perspective(1500px) rotateY(10deg);
-  transform: scale(1.1) perspective(1500px) rotateY(10deg);
+  -webkit-transform: scale(1.25) perspective(1550px) rotateY(25deg);
+  transform: scale(1.25) perspective(1550px) rotateY(25deg);
 }
 
 .weather-gradient {
